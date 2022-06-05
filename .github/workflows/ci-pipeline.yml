@@ -1,0 +1,21 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+    type: [ opened, synchronize ]
+
+
+jobs:
+  ci-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - id: composite_action
+        uses: ./.github/setup-python-env
+      - name: Run flake8
+        if: ${{ steps.composite_action.outputs.py_modified == 'true' }}
+        run: flake8 ${{ steps.composite_action.outputs.py_modified_files }}
+      - name: Run pytest
+        if: ${{ steps.composite_action.outputs.py_modified == 'true' }}
+        run: pytest tests

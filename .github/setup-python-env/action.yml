@@ -1,0 +1,30 @@
+name: Setup Python Enviroment
+outputs:
+  py_modified:
+    description: Python file changed
+    value: ${{ steps.filter.outputs.py_modified }}
+  py_modified_files:
+    value: ${{ steps.filter.outputs.py_modified_files }}
+runs:
+  using: "composite"
+  steps:
+    - name: Get changed files
+      uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        list-files: shell
+        filters: |
+          py_modified:
+            - added|modified: "./**/*.py"
+    - name: Setup Python
+      if: ${{ steps.filter.outputs.py_modified == 'true' }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.10.0
+        architecture: x64
+        cache: 'pip'
+    - name: Install dependencies
+      if: ${{ steps.filter.outputs.py_modified == 'true' }}
+      shell: bash
+      run: pip install -r requirements.txt
+
