@@ -1,0 +1,69 @@
+swagger: '2.0'
+info:
+  title: API Gateway for GitHub Webhook Events
+  description: Sample API on API Gateway with a Cloud Run backend
+  version: 0.1.0
+schemes:
+  - https
+produces:
+  - application/json
+x-google-backend:
+  address: https://sample-fastapi-webhook-hy3pspxs6a-uw.a.run.app
+security: [ ]
+paths:
+  /webhook:
+    post:
+      operationId: webhook_webhook_post
+      parameters:
+          - in: header
+            name: x-hub-signature
+            required: false
+            type: string
+      produces:
+        - application/json
+      responses:
+        '202':
+          description: Successful Response
+          schema: { }
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+      summary: Webhook
+      security:
+        - api_key: [ ]
+definitions:
+  HTTPValidationError:
+    properties:
+      detail:
+        items:
+          $ref: '#/definitions/ValidationError'
+        title: Detail
+        type: array
+    title: HTTPValidationError
+    type: object
+  ValidationError:
+    properties:
+      loc:
+        items:
+          type: string
+        title: Location
+        type: array
+      msg:
+        title: Message
+        type: string
+      type:
+        title: Error Type
+        type: string
+    required:
+      - loc
+      - msg
+      - type
+    title: ValidationError
+    type: object
+securityDefinitions:
+  # This section configures basic authentication with an API key.
+  api_key:
+    type: "apiKey"
+    name: "key"
+    in: "query"
